@@ -1,70 +1,29 @@
-- [Livrables](#livrables)
+# SWI - Labo 5 - Attaque PMKID 
 
-- [Échéance](#échéance)
+## Auteurs : Daniel Oliveira Paiva et Edin Mujkanovic
 
-- [Travail à réaliser](#travail-à-réaliser)
+### Script attaque PMKID  : 
 
-# Sécurité des réseaux sans fil
+Le script se trouve dans le dossier`files` situé à la racine du projet. Il utilise les fichiers `dictionnary` comme dictionnaire, `PMKID_handshake.pcap` comme fichier contenant les trames et `pbkdf2.py` comme librairie.
 
-## Laboratoire WPA - PMKID
+Ci-dessous, une capture d'écran de exécution de notre script : 
 
-__A faire en équipes de deux personnes__
+![](.\images\script.png)
 
-__Développement à faire en Python 3__
+**NOTE : ** Durant le développement du script, nous avons essayé d'utiliser `haslayer()` sur le paquet mais cela n'a pas fonctionné. En effet, nous recevions un message comme quoi cette méthode n'existait pas. Afin de contourner ceci, et garder le script dynamique, nous avons du entourer nos différentes méthodes de `try/except` et de forcer la récupération des layers `EAPOL` et `Dot11` en utilisant `ea = p[EAPOL]`. Si le paquet contient le layer souhaité, le script continue normalement, sinon, il passe dans l'except et passe au paquet suivant. Cela n'est pas très propre mais c'est le seul moyen que nous avons trouvé afin de garder le script dynamique pour n'importe quel fichier de capture en entrée. 
 
-### Pour cette partie pratique, vous devez être capable de :
+### Hashcat : 
 
-* A partir d’une capture Wireshark, extraire la valeur de la PMKID utilisant Scapy
-* Ecrire un script Python pour Cracker la passphrase WPA utilisant la PMKID
+Ci-dessous, une capture d'écran de l'attaque PMKID avec l'outil hashcat : 
 
-Pour l'explication de l'attaque, référez vous à la video suivante :
+**Formatage du fichier :**
 
-[![PMKID attack](http://img.youtube.com/vi/APkk9C2sydM/0.jpg)](http://www.youtube.com/watch?v=APkk9C2sydM "PMKID attack")
+![](.\images\format_pcap_hashcat.png)
 
+**Execution hashcat : **
 
-## Travail à réaliser
-
-### 1. Obtention de la PMKID et des paramètres pour la dérivation de la PMK  
-
-Dans cette première partie, vous allez réutiliser le script de dérivation de clés que vous avez rendu pour le [labo WPA](https://github.com/arubinst/HEIGVD-SWI-Labo4-WPA). Il vous faudra également le fichier de capture [PMKID_handshake.pcap](files/PMKID_handshake.pcap) contenant une tentative d’authentification WPA pas réussie réalisée par un attaquant.
-
-La PMKID est contenue dans le premier message du 4-way handshake de certains AP. Les AP de l'opérateur Sunrise sont vulnérables. Il s'agit donc d'un AP de Sunrise qui a été utilisé pour faire [la capture](files/PMKID_handshake.pcap). 
-
-Voici ce que vous devez faire pour cette première partie :
-
-- __Modifier votre script WPA__ pour qu’il récupère automatiquement, à partir de la capture, la valeur de la PMKID
-- Vous aurez aussi besoin de récupérer les valeurs du ```ssid```, ```APmac``` et ```Clientmac``` (ceci est normalement déjà fait par votre script) 
+![](.\images\hash_found.png)
 
 
-### 2. Cracker la Passphrase utilisant l'attaque PMKID
 
-L'attaque PMKID est une attaque par dictionnaire qui calcule systématiquement une PMK à partir de la passphrase. Cette PMK est utilisée comme clé pour SHA-1 calculé sur une concatenation du string "PMK Name" et les adresses MAC de l'AP et la STA. Les premiers 128 bits (6 octets) du résultat de ce calcul doivent correspondre à la valeur de la PMKID obtenue à partir du premier message du 4-way handshake.
-
-Utilisant votre script précédent, le modifier pour réaliser les taches suivantes :
-
-- Lire une passphrase à partir d’un fichier (wordlist) &rarr; __La passphrase utilisée dans la capture es ```admin123```__
-- Dériver la PMK à partir de la passphrase que vous venez de lire et des autres éléments nécessaires contenus dans la capture (cf [exercice 1](#1-obtention-de-la-pmkid-et-des-paramètres-pour-la-dérivation-de-la-pmk))
-- Calculer la PMKID (cf vidéo YouTube)
-- Comparer la PMKID calculée avec celle récupérée de la capture :
-   - Identiques &rarr; La passphrase utilisée est correcte
-   - Différents &rarr; Essayer avec une nouvelle passphrase
-
-
-### 3. Attaque hashcat
-
-A manière de comparaison, réaliser l'attaque sur le [fichier de capture](files/PMKID_handshake.pcap) utilisant la méthode décrite [ici](https://hashcat.net/forum/thread-7717.html).
-
-
-## Livrables
-
-Un fork du repo original . Puis, un Pull Request contenant **vos noms** et :
-
-- Script ```pmkid_attack.py``` **abondamment commenté/documenté** + fichier wordlist
-   - Capture d’écran de votre script en action
-- Captures d'écran de votre exercice 3
--	Envoyer le hash du commit et votre username GitHub et **les noms des participants** par email au professeur et à l'assistant
-
-
-## Échéance
-
-Le 04 mai 2020 à 23h59
+Nous avons utilisé le même dictionnaire que pour le script. En effet, vu que nous travaillons dans une machine virtuelle, il nous était impossible de faire du brute-force ou même d'utiliser la wordlist `rockyou` par manque de performance.
