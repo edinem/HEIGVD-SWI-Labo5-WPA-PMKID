@@ -20,7 +20,7 @@ Ci-dessous, une capture d'écran de l'attaque PMKID avec l'outil hashcat :
 
 ![](./images/format_pcap_hashcat.png)
 
-**Execution hashcat : **
+**Execution hashcat** :
 
 ![](./images/hash_found.png)
 
